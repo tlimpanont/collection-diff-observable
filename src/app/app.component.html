@@ -1,3 +1,31 @@
-<h1>
-  {{title}}
-</h1>
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-2 col-md-push-5">
+        <br>
+        <button class="btn btn-primary animated fadeInDown btn-block" type="button" id="refresh" (click)="refresh($event)" *ngIf="newItemsCount">
+          New updates <span class="badge">{{newItemsCount}}</span>
+        </button>
+    </div>
+    <div class="col-md-12">
+      <h2>Users list</h2>
+      <ul class="list-group">
+        <list-item *ngFor="let item of collection" [animationType]="item.animationType">
+          <div class="media">
+            <div class="media-left">
+              <a href="#">
+                <img class="media-object img-circle" src="{{item.image}}" alt="{{item.name}}">
+              </a>
+            </div>
+            <div class="media-body">
+              <h4 class="media-heading">{{item.name}} </h4> <span class="label label-default pull-right">{{item.id}}</span>
+              <p>
+                {{item.text}}
+              </p>
+            </div>
+          </div>
+        </list-item>
+      </ul>
+    </div>
+  </div>
+</div>
