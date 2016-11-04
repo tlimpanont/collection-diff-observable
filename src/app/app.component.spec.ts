@@ -5,6 +5,7 @@ import { AppComponent } from "./app.component";
 import {ListItem} from "./list-item.component";
 import {MockServerService} from "./mock-server.service";
 import {DiffTransFormerService} from "./diff-transformer.service";
+import {DistinctUntilChangedDiffService} from "./distinct-until-changed-diff.service";
 
 describe("App: AngularCli", () => {
   beforeEach(async(() => {
@@ -15,7 +16,8 @@ describe("App: AngularCli", () => {
       ],
       providers: [
         MockServerService,
-        DiffTransFormerService
+        DiffTransFormerService,
+        DistinctUntilChangedDiffService
       ]
     });
   }));

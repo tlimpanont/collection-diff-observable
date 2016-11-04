@@ -7,6 +7,7 @@ import { AppComponent } from "./app.component";
 import {MockServerService} from "./mock-server.service";
 import {ListItem} from "./list-item.component";
 import {DiffTransFormerService} from "./diff-transformer.service";
+import {DistinctUntilChangedDiffService} from "./distinct-until-changed-diff.service";
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import {DiffTransFormerService} from "./diff-transformer.service";
   ],
   providers: [
     MockServerService,
-    DiffTransFormerService
+    DiffTransFormerService,
+    DistinctUntilChangedDiffService
   ],
   bootstrap: [AppComponent]
 })
