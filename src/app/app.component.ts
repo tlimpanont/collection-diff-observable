@@ -11,7 +11,7 @@ import * as _ from "lodash";
 })
 export class AppComponent {
   title = "app works!";
-  private refreshClick = new Subject<Event>();
+  private _refreshClick$ = new Subject<Event>();
   collection: Array<any> = [];
   data$;
   newItemsCount = 0;
@@ -20,7 +20,7 @@ export class AppComponent {
 
     this.data$ = this._distinct.distinctUntilChangedDiff$(mockServer.onMessage$());
 
-    let sub = this.data$.take(1).subscribe({
+    this.data$.take(1).subscribe({
       next: ([newCollection]) => {
         console.log("inital loaded data", newCollection);
         this.collection = newCollection;
@@ -37,43 +37,23 @@ export class AppComponent {
     this._distinct.updateDiff$(this.data$)
       .subscribe(([newCollection, diffCollection]) => {
         let {updatedCollection} = diffCollection;
-
-        this.collection.forEach((item: any, index: number) => {
-          let _col = _.filter(updatedCollection, _.matches({id: item.id}));
-          _col.forEach((_item: any) => {
-            if (item.id === _item.id) {
-
-              console.log(item);
-              console.log(_item);
-
-              this.collection[index] = _item;
-              this.collection[index].animationType = "update";
-            }
-          });
-        });
+        this._distinct.applyUpdatesToCollection(updatedCollection, this.collection, "id");
       });
 
-    this._distinct.createDiff$(this.data$)
+    this._distinct
+      .createDiff$(this.data$)
       .subscribe(([newCollection, diffCollection]) => {
         let {createdCollection} = diffCollection;
         this.newItemsCount += createdCollection.length;
-        Observable.timer(0).subscribe(() => {
-          let mouse = Observable.fromEvent(document.getElementById("refresh"), "click")
-            .subscribe(() => {
-
-              createdCollection.forEach((item: any, index: number) => {
-                item.animationType = "in";
-                this.collection.unshift(item);
-              });
-
-              this.newItemsCount = 0;
-              mouse.unsubscribe();
-            });
+        this._refreshClick$.subscribe(() => {
+          this._distinct.prependCreationsToCollection(createdCollection, this.collection);
+          this.newItemsCount = 0;
+          window.scrollTo(0, 0);
         });
       });
   }
 
   refresh($event: any) {
-    this.refreshClick.next($event);
+    this._refreshClick$.next($event);
   }
 }

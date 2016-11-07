@@ -66,14 +66,13 @@ export class DistinctUntilChangedDiffService {
     return !diffResult;
   }
 
-  public distinctUntilChangedDiff$(
-    collection$: Observable<Array<any>>,
-  ): Observable<Array<[Array<any>, DiffCollection]>> {
+  public distinctUntilChangedDiff$(sourceCollection$: Observable<Array<any>>,): Observable<Array<[Array<any>, DiffCollection]>> {
 
-    return collection$
+    return sourceCollection$
       .distinctUntilChanged(this._comparer.bind(this))
       .withLatestFrom(this._diffCollection);
   }
+
   public updateDiff$(distinctUntilChangedDiff$: Observable<any>) {
     return distinctUntilChangedDiff$
       .filter(([newCollection, diffCollection]) => (diffCollection && diffCollection.updatedCollection));
@@ -82,5 +81,35 @@ export class DistinctUntilChangedDiffService {
   public createDiff$(distinctUntilChangedDiff$: Observable<any>) {
     return distinctUntilChangedDiff$
       .filter(([newCollection, diffCollection]) => (diffCollection && diffCollection.createdCollection));
+  }
+
+  public deleteDiff$(distinctUntilChangedDiff$: Observable<any>) {
+    return distinctUntilChangedDiff$
+      .filter(([newCollection, diffCollection]) => (diffCollection && diffCollection.deletedCollection));
+  }
+
+  public applyUpdatesToCollection(updatedCollection: Array<any>,
+                                  sourceCollection: Array<any>, uniqIdProp: string,
+                                  animationType: string = "update") {
+    sourceCollection.forEach((item: any, index: number) => {
+      let matches: any = {};
+      matches[uniqIdProp] = item[uniqIdProp];
+      let _col = _.filter(updatedCollection, _.matches(matches));
+      _col.forEach((_item: any) => {
+        if (item[uniqIdProp] === _item[uniqIdProp]) {
+          sourceCollection[index] = _item;
+          sourceCollection[index].animationType = animationType;
+        }
+      });
+    });
+  }
+
+  public prependCreationsToCollection(createdCollection: Array<any>,
+                                      sourceCollection: Array<any>,
+                                      animationType: string = "in") {
+    createdCollection.forEach((item: any, index: number) => {
+      item.animationType = animationType;
+      sourceCollection.unshift(item);
+    });
   }
 }

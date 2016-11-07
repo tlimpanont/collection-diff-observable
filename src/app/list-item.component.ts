@@ -16,7 +16,7 @@ import {Component, style, state, animate, transition, trigger, Input, keyframes}
         animate('.6s ease-in-out')
       ]),
       transition("void => update", [
-        animate('1.5s ease-in-out', keyframes([
+        animate('1s ease-in', keyframes([
           style({backgroundColor: "#fce5bf", offset: 0}),
           style({backgroundColor: "transparent", offset: 0.98})
         ]))
