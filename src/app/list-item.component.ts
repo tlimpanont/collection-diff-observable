@@ -1,4 +1,4 @@
-import {Component, style, state, animate, transition, trigger, Input} from "@angular/core";
+import {Component, style, state, animate, transition, trigger, Input, keyframes} from "@angular/core";
 
 @Component({
   selector: "list-item",
@@ -10,9 +10,16 @@ import {Component, style, state, animate, transition, trigger, Input} from "@ang
   animations: [
     trigger("animationType", [
       state("in", style({transform: "translateY(0)"})),
+      state("update", style({backgroundColor: "transparent"})),
       transition("void => in", [
         style({transform: "translateY(-100%)"}),
         animate('.6s ease-in-out')
+      ]),
+      transition("void => update", [
+        animate('1.5s ease-in-out', keyframes([
+          style({backgroundColor: "#fce5bf", offset: 0}),
+          style({backgroundColor: "transparent", offset: 0.98})
+        ]))
       ])
     ])
   ]

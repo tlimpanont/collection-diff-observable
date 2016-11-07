@@ -1,10 +1,8 @@
-import {Component, style, state, animate, transition, trigger} from "@angular/core";
+import {Component} from "@angular/core";
 import {MockServerService} from "./mock-server.service";
 import {Observable, Subject} from "rxjs/Rx";
-import {DiffTransFormerService} from "./diff-transformer.service";
-var _ = require("lodash");
-var deepDiff = require("deep-diff");
-var observableDiff = require("deep-diff").observableDiff;
+import {DistinctUntilChangedDiffService} from "./distinct-until-changed-diff.service";
+import * as _ from "lodash";
 
 @Component({
   selector: "app-root",
@@ -18,43 +16,63 @@ export class AppComponent {
   data$;
   newItemsCount = 0;
 
-  constructor(mockServer: MockServerService, diffTransformer: DiffTransFormerService) {
-    mockServer.start();
+  constructor(mockServer: MockServerService, private _distinct: DistinctUntilChangedDiffService) {
 
-    this.data$ = diffTransformer.oldNewComparison$(mockServer.onMessage);
+    this.data$ = this._distinct.distinctUntilChangedDiff$(mockServer.onMessage$());
 
     let sub = this.data$.take(1).subscribe({
-      next: (x) => {
-        console.log("inital loaded data", x);
-        this.collection = x.newCollection;
+      next: ([newCollection]) => {
+        console.log("inital loaded data", newCollection);
+        this.collection = newCollection;
       },
       error: (err) => {
         console.error("something wrong occurred: " + err)
       },
-      complete: () => {
-        this.data$.subscribe(({
-          oldCollection,
-          newCollection,
-          addedItemsCollection,
-          editedItemsCollection
-        }) => {
-          console.log("continous data");
-          this.newItemsCount += addedItemsCollection.length;
-          Observable.timer(0).subscribe(() => {
-            let mouse = Observable.fromEvent(document.getElementById("refresh"), "click")
-              .subscribe(() => {
-                addedItemsCollection.forEach((item: any) => {
-                  item.animationType = "in";
-                  this.collection.unshift(item);
-                  this.newItemsCount = 0;
-                  mouse.unsubscribe();
-                });
-              });
-          });
-        });
-      }
+      complete: this._dataLoaded.bind(this)
     });
   }
+
+  private _dataLoaded() {
+
+    this._distinct.updateDiff$(this.data$)
+      .subscribe(([newCollection, diffCollection]) => {
+        let {updatedCollection} = diffCollection;
+
+        this.collection.forEach((item: any, index: number) => {
+          let _col = _.filter(updatedCollection, _.matches({id: item.id}));
+          _col.forEach((_item: any) => {
+            if (item.id === _item.id) {
+
+              console.log(item);
+              console.log(_item);
+
+              this.collection[index] = _item;
+              this.collection[index].animationType = "update";
+            }
+          });
+        });
+      });
+
+    this._distinct.createDiff$(this.data$)
+      .subscribe(([newCollection, diffCollection]) => {
+        let {createdCollection} = diffCollection;
+        this.newItemsCount += createdCollection.length;
+        Observable.timer(0).subscribe(() => {
+          let mouse = Observable.fromEvent(document.getElementById("refresh"), "click")
+            .subscribe(() => {
+
+              createdCollection.forEach((item: any, index: number) => {
+                item.animationType = "in";
+                this.collection.unshift(item);
+              });
+
+              this.newItemsCount = 0;
+              mouse.unsubscribe();
+            });
+        });
+      });
+  }
+
   refresh($event: any) {
     this.refreshClick.next($event);
   }
