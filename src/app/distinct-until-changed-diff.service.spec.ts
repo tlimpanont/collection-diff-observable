@@ -26,6 +26,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let beforeChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Theuy Limpanont",
         books: [
           "Angular2",
@@ -39,6 +40,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let afterChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Theuy Limpanont",
         books: [
           "Angular2",
@@ -49,6 +51,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
         ]
       },
       {
+        id: 2,
         name: "Tam Limpanont",
         books: [
           "Angular2",
@@ -76,6 +79,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let beforeChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Theuy Limpanont",
         books: [
           "Angular2",
@@ -89,6 +93,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let afterChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Tam Limpanont",
         books: [
           "Angular2",
@@ -116,6 +121,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let beforeChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Theuy Limpanont",
         books: [
           "Angular2",
@@ -126,6 +132,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
         ]
       },
       {
+        id: 2,
         name: "Tam Limpanont",
         books: [
           "Angular2",
@@ -139,6 +146,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let afterChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Theuy Limpanont",
         books: [
           "Angular2",
@@ -166,6 +174,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let beforeChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Theuy Limpanont",
         books: [
           "Angular2",
@@ -179,6 +188,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
 
     let afterChangeCollection: Array<any> = [
       {
+        id: 1,
         name: "Tam Limpanont",
         books: [
           "TypeScript",
@@ -233,23 +243,12 @@ describe('Service: DistinctUntilChangedDiff', () => {
     let afterChangeCollection: Array<any> = [
       {
         id: 2,
-        name: "Tam Limpanont",
+        name: "Duan Limpanont",
         books: [
           "Typescript",
           "NodeJS",
           {
             chapters: [22]
-          }
-        ]
-      },
-      {
-        id: 3,
-        name: "Duan Limpanont",
-        books: [
-          "Angular2",
-          "NodeJS",
-          {
-            chapters: [1]
           }
         ]
       }
@@ -262,7 +261,7 @@ describe('Service: DistinctUntilChangedDiff', () => {
       .subscribe(([newCollection, diffCollection]) => {
         expect(diffCollection.createdCollection.length).toEqual(0);
         expect(diffCollection.updatedCollection.length).toEqual(1);
-        expect(diffCollection.deletedCollection.length).toEqual(0);
+        expect(diffCollection.deletedCollection.length).toEqual(1);
         expect(diffCollection.oldCollection).not.toEqual(newCollection);
         expect(newCollection).toEqual(afterChangeCollection);
         done();
